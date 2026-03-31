@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Macaque — Vocabulary</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0e0e12; --bg2:#16161d; --bg3:#1e1e28; --border:#2a2a38;
+  --text:#f0eeff; --text2:#8c8aaa; --text3:#5a5870;
+  --accent:#7c6aff; --accent2:#a993ff; --glow:rgba(124,106,255,.18);
+  --green:#3ec97e; --red:#ff5e6c; --orange:#ff9f50; --yellow:#f5d76e;
+  --noun:#7c6aff; --verb:#3ec97e; --adj:#ff9f50; --adv:#f5d76e;
+  --r:18px; --tr:all .2s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="light"]{
+  --bg:#f3f2ff; --bg2:#fff; --bg3:#eae8ff; --border:#dddaf5;
+  --text:#1a1830; --text2:#5a5680; --text3:#9896b8;
+  --accent:#6655ee; --accent2:#8b7cf7; --glow:rgba(102,85,238,.13);
+  --green:#2ea865; --red:#e03545; --orange:#e07a20; --yellow:#c8a500;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden}
+.screen{display:none;flex-direction:column;min-height:100vh}
+.screen.active{display:flex}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;background:var(--bg);position:sticky;top:0;z-index:50;border-bottom:1px solid var(--border)}
+.logo{font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr-btns{display:flex;gap:8px}
+.ibtn{width:38px;height:38px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--tr);color:var(--text2);font-size:1rem;user-select:none}
+.ibtn:active{transform:scale(.9);background:var(--border)}
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:200}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;color:var(--text3);font-size:.6rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;transition:var(--tr);user-select:none}
+.ni.active{color:var(--accent)}
+.ni-icon{font-size:1.2rem;line-height:1}
+.ni.active .ni-icon{filter:drop-shadow(0 0 5px var(--accent))}
+.cnt{flex:1;overflow-y:auto;padding:16px 16px 90px}
+.cnt::-webkit-scrollbar{display:none}
+.stitle{font-size:.63rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;padding:0 2px}
+.searchbar{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:10px 14px;margin-bottom:14px}
+.searchbar input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:'Syne',sans-serif;font-size:.95rem}
+.searchbar input::placeholder{color:var(--text3)}
+.gchips{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px}
+.gchips::-webkit-scrollbar{display:none}
+.gchip{flex-shrink:0;padding:6px 14px;border-radius:99px;background:var(--bg2);border:1.5px solid var(--border);font-size:.75rem;font-weight:600;color:var(--text2);cursor:pointer;transition:var(--tr);white-space:nowrap;user-select:none}
+.gchip.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 12px var(--glow)}
+.wiwrap{position:relative;margin-bottom:10px;overflow:hidden;border-radius:var(--r)}
+.wi-delbg{position:absolute;right:0;top:0;bottom:0;width:80px;background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.3rem;border-radius:var(--r)}
+.wi{position:relative;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;touch-action:pan-y}
+.wi:active{background:var(--bg3)}
+.tdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:2px}
+.wi-main{flex:1;min-width:0}
+.wi-name{font-size:1rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wi-meta{display:flex;align-items:center;gap:8px;margin-top:2px}
+.wi-type{font-size:.67rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.wi-tr{font-size:.78rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.wi-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.wscore{font-size:.72rem;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent2)}
+.wfav{font-size:1rem;color:var(--text3)}
+.wfav.on{color:#ff7eb3}
+.fab{position:fixed;bottom:75px;right:calc(50% - 215px + 18px);width:54px;height:54px;border-radius:18px;background:linear-gradient(135deg,var(--accent2),var(--accent));box-shadow:0 4px 20px var(--glow);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:#fff;cursor:pointer;z-index:150;transition:var(--tr);user-select:none}
+.fab:active{transform:scale(.92)}
+.moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.moverlay.open{display:flex}
+.modal{background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:430px;max-height:92vh;overflow-y:auto;padding:20px 20px calc(24px + env(safe-area-inset-bottom));animation:sup .3s cubic-bezier(.4,0,.2,1)}
+.modal::-webkit-scrollbar{display:none}
+@keyframes sup{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.mhandle{width:40px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 18px}
+.mtitle{font-size:1.2rem;font-weight:800;margin-bottom:16px}
+.ig{margin-bottom:14px}
+.ilabel{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.tinput{width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;color:var(--text);font-family:'Syne',sans-serif;font-size:.95rem;outline:none;transition:var(--tr)}
+.tinput:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+.btnp{width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;border:none;cursor:pointer;transition:var(--tr);box-shadow:0 4px 16px var(--glow)}
+.btnp:active{transform:scale(.97);opacity:.9}
+.btnp:disabled{opacity:.5;cursor:not-allowed}
+.btns{width:100%;padding:14px;border-radius:14px;background:var(--bg3);color:var(--text);font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;border:1.5px solid var(--border);cursor:pointer;transition:var(--tr)}
+.btnr{width:100%;padding:14px;border-radius:14px;background:var(--red);color:#fff;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;border:none;cursor:pointer;transition:var(--tr)}
+.ldrow{display:flex;align-items:center;justify-content:center;gap:10px;padding:18px;color:var(--text2);font-size:.9rem}
+.spin{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.errmsg{color:var(--red);font-size:.82rem;padding:10px;background:rgba(255,94,108,.1);border-radius:10px;margin-bottom:12px}
+.dword{font-size:1.9rem;font-weight:800;letter-spacing:-.03em;margin-bottom:2px}
+.dphon{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--text2);display:flex;align-items:center;gap:8px}
+.spkbtn{width:28px;height:28px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;color:var(--accent);transition:var(--tr);flex-shrink:0}
+.spkbtn:active{transform:scale(.88)}
+.dtbadge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:99px;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:10px 0 14px}
+.dsec{margin-bottom:16px}
+.dlbl{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.dval{font-size:.9rem;color:var(--text);line-height:1.5}
+.dex{font-family:'Instrument Serif',serif;font-style:italic;font-size:.98rem;color:var(--text2);line-height:1.6;background:var(--bg3);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 10px 10px 0}
+.chiprow{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:5px 12px;border-radius:99px;font-size:.78rem;font-weight:600;background:var(--bg3);border:1px solid var(--border);color:var(--text)}
+.famrow{display:flex;flex-wrap:wrap;gap:8px}
+.famitem{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:.8rem}
+.fampos{font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.famword{font-weight:700;margin-top:1px}
+.dstats{display:flex;gap:12px;margin-top:4px}
+.sbox{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 12px;text-align:center}
+.snum{font-size:1.4rem;font-weight:800;font-family:'DM Mono',monospace}
+.slbl{font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+.snum.g{color:var(--green)} .snum.r{color:var(--red)}
+.sbar{height:6px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-top:8px}
+.sfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.ggrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gcard{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:20px 14px;cursor:pointer;transition:var(--tr);text-align:center;user-select:none}
+.gcard:active{transform:scale(.95)}
+.gicon{font-size:1.9rem;margin-bottom:8px}
+.gname{font-size:.85rem;font-weight:700}
+.gdesc{font-size:.7rem;color:var(--text2);margin-top:3px}
+.ghdr{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.gbk{width:36px;height:36px;border-radius:11px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;color:var(--text2);transition:var(--tr);user-select:none}
+.gbk:active{transform:scale(.9)}
+.gtitle{font-size:1rem;font-weight:700;flex:1}
+.gsbadge{background:var(--accent);color:#fff;border-radius:99px;padding:4px 12px;font-size:.78rem;font-weight:700;font-family:'DM Mono',monospace}
+.gpbar{height:4px;background:var(--bg3);border-radius:99px;overflow:hidden;margin:0 18px}
+.gpfill{height:100%;background:var(--accent);border-radius:99px;transition:width .4s ease}
+.gcnt{flex:1;padding:22px 18px;display:flex;flex-direction:column;gap:18px;overflow-y:auto}
+.gcnt::-webkit-scrollbar{display:none}
+.gqcard{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:26px 18px;text-align:center;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.gqlbl{font-size:.65rem;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
+.gqtext{font-size:1.45rem;font-weight:800;letter-spacing:-.02em}
+.gqsub{font-size:.85rem;color:var(--text2);font-family:'Instrument Serif',serif;font-style:italic}
+.gopts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gopt{background:var(--bg2);border:2px solid var(--border);border-radius:14px;padding:15px 12px;text-align:center;cursor:pointer;transition:var(--tr);font-size:.87rem;font-weight:600;line-height:1.3;user-select:none}
+.gopt:active:not(.disabled){transform:scale(.96)}
+.gopt.correct{border-color:var(--green);background:rgba(62,201,126,.12);color:var(--green)}
+.gopt.wrong{border-color:var(--red);background:rgba(255,94,108,.1);color:var(--red)}
+.gopt.disabled{pointer-events:none}
+.gresult{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px 24px;text-align:center}
+.remoji{font-size:4rem}
+.rtitle{font-size:1.6rem;font-weight:800}
+.rscore{font-size:1.05rem;color:var(--text2)}
+.rscore span{color:var(--accent2);font-weight:700}
+.srow{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:13px 15px;margin-bottom:8px;cursor:pointer;user-select:none}
+.srow-info{flex:1;min-width:0;margin-right:12px}
+.srow-t{font-size:.9rem;font-weight:600}
+.srow-s{font-size:.75rem;color:var(--text2);margin-top:2px}
+.toggle{width:46px;height:26px;border-radius:13px;background:var(--bg3);border:1.5px solid var(--border);cursor:pointer;position:relative;transition:var(--tr);flex-shrink:0;pointer-events:none}
+.toggle.on{background:var(--accent);border-color:var(--accent)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--text3);transition:var(--tr)}
+.toggle.on::after{left:22px;background:#fff}
+.apiwarn{background:rgba(255,159,80,.1);border:1px solid rgba(255,159,80,.3);border-radius:12px;padding:12px 14px;font-size:.8rem;color:var(--orange);line-height:1.5;margin-bottom:14px}
+.apivwrap{position:relative}
+.apivbtn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:1rem;padding:4px}
+.grpitem{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.grpname{font-size:.9rem;font-weight:600}
+.grpcnt{font-size:.75rem;color:var(--text2)}
+.grpdel{color:var(--red);font-size:1.1rem;cursor:pointer;padding:4px 8px;user-select:none}
+.arow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.arow:last-child{border-bottom:none}
+.acheck{width:22px;height:22px;border-radius:7px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--tr);user-select:none;flex-shrink:0}
+.acheck.on{background:var(--accent);border-color:var(--accent);color:#fff;font-size:.7rem}
+.sscope{width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);font-family:'Syne',sans-serif;font-size:.9rem;outline:none;appearance:none;cursor:pointer;margin-bottom:8px}
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:3rem;margin-bottom:12px;opacity:.5}
+.empty-t{font-size:1rem;font-weight:700;color:var(--text2);margin-bottom:6px}
+.empty-s{font-size:.82rem;line-height:1.5}
+.divider{height:1px;background:var(--border);margin:12px 0}
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 18px;font-size:.82rem;font-weight:600;color:var(--text);z-index:1000;opacity:0;transition:all .25s ease;white-space:nowrap;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@keyframes fin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fin{animation:fin .2s ease}
+</style>
+</head>
+<body>
+
+<!-- VOCAB SCREEN -->
+<div id="s-vocab" class="screen active">
+  <div class="hdr">
+    <div class="logo">🐒 macaque</div>
+    <div class="hdr-btns">
+      <div class="ibtn" id="btn-groups">⊞</div>
+      <div class="ibtn" id="btn-theme">☀️</div>
+    </div>
+  </div>
+  <div class="cnt">
+    <div class="searchbar"><span style="color:var(--text3)">🔍</span><input id="search-inp" type="text" placeholder="Search words…"></div>
+    <div class="gchips" id="gchips"></div>
+    <div class="stitle" id="wcount">0 WORDS</div>
+    <div id="wlist"></div>
+  </div>
+  <div class="fab" id="fab-add">＋</div>
+</div>
+
+<!-- GAMES SCREEN -->
+<div id="s-games" class="screen">
+  <div class="hdr"><div class="logo">🐒 macaque</div></div>
+  <div class="cnt">
+    <div class="stitle">MINI GAMES</div>
+    <div class="ggrid">
+      <div class="gcard" data-game="definition"><div class="gicon">📖</div><div class="gname">Definition</div><div class="gdesc">Match word to meaning</div></div>
+      <div class="gcard" data-game="antonym"><div class="gicon">🔄</div><div class="gname">Antonym</div><div class="gdesc">Find the opposite</div></div>
+      <div class="gcard" data-game="synonym"><div class="gicon">🔗</div><div class="gname">Synonym</div><div class="gdesc">Find the similar word</div></div>
+      <div class="gcard" data-game="turkish"><div class="gicon">🇹🇷</div><div class="gname">Turkish Match</div><div class="gdesc">Match Turkish meaning</div></div>
+    </div>
+    <div class="divider" style="margin:22px 0 14px"></div>
+    <div class="stitle">HOW TO PLAY</div>
+    <div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:14px;font-size:.82rem;color:var(--text2);line-height:1.7">Choose a game, select word scope, and answer 4-option questions. Your results are saved per word!</div>
+  </div>
+</div>
+
+<!-- SETTINGS SCREEN -->
+<div id="s-settings" class="screen">
+  <div class="hdr"><div class="logo">🐒 macaque</div></div>
+  <div class="cnt">
+    <div class="stitle">API CONFIGURATION</div>
+    <div class="apiwarn">⚠️ API key is stored locally on your device only.</div>
+    <div class="ig"><div class="ilabel">Gemini Model Name</div><input type="text" class="tinput" id="api-model" placeholder="gemini-2.0-flash"></div>
+    <div class="ig"><div class="ilabel">Gemini API Key</div><div class="apivwrap"><input type="password" class="tinput" id="api-key" placeholder="AIza…"><button class="apivbtn" id="btn-apiv">👁</button></div></div>
+    <button class="btnp" id="btn-save-api" style="margin-bottom:24px">Save Settings</button>
+    <div class="stitle">APPEARANCE</div>
+    <div class="srow" id="row-darkmode" style="margin-bottom:24px;cursor:pointer">
+      <div class="srow-info"><div class="srow-t">Dark Mode</div><div class="srow-s">Easy on the eyes</div></div>
+      <div class="toggle on" id="dark-tog"></div>
+    </div>
+    <div class="stitle">STATS</div>
+    <div id="gstats" style="margin-bottom:24px"></div>
+    <div class="stitle">DATA</div>
+    <div class="srow" id="btn-export"><div class="srow-info"><div class="srow-t">Export Words</div><div class="srow-s">Download as JSON</div></div><span style="color:var(--text3)">↓</span></div>
+    <div class="srow" id="btn-import" style="margin-top:8px"><div class="srow-info"><div class="srow-t">Import Words</div><div class="srow-s">From file or paste JSON</div></div><span style="color:var(--text3)">↑</span></div>
+    <input type="file" id="import-file-inp" accept=".json" style="display:none">
+    <div class="srow" id="btn-clear" style="margin-top:8px"><div class="srow-info"><div class="srow-t" style="color:var(--red)">Clear All Data</div><div class="srow-s">Delete all words &amp; groups</div></div><span style="color:var(--red)">🗑</span></div>
+  </div>
+</div>
+
+<!-- GAME PLAY SCREEN -->
+<div id="s-gameplay" class="screen">
+  <div class="ghdr">
+    <div class="gbk" id="btn-game-back">←</div>
+    <div class="gtitle" id="gplay-title">Game</div>
+    <div class="gsbadge" id="gsbadge">0 / 0</div>
+  </div>
+  <div class="gpbar"><div class="gpfill" id="gpfill" style="width:0%"></div></div>
+  <div class="gcnt" id="gcnt"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <div class="ni active" data-screen="vocab" id="ni-vocab"><span class="ni-icon">📚</span><span>Words</span></div>
+  <div class="ni" data-screen="games" id="ni-games"><span class="ni-icon">🎮</span><span>Games</span></div>
+  <div class="ni" data-screen="settings" id="ni-settings"><span class="ni-icon">⚙️</span><span>Settings</span></div>
+</nav>
+
+<!-- MODAL: ADD WORD -->
+<div class="moverlay" id="m-addword">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">Add New Word</div>
+    <div class="ig"><div class="ilabel">English Word</div><input type="text" class="tinput" id="nw-inp" placeholder="e.g. serendipity" autocomplete="off"></div>
+    <div id="nw-loading" style="display:none"><div class="ldrow"><div class="spin"></div><span>Analyzing with AI…</span></div></div>
+    <div id="nw-err" class="errmsg" style="display:none"></div>
+    <button class="btnp" id="btn-analyze">✨ Analyze with AI</button>
+  </div>
+</div>
+
+<!-- MODAL: WORD DETAIL -->
+<div class="moverlay" id="m-detail">
+  <div class="modal" id="m-detail-body"></div>
+</div>
+
+<!-- MODAL: GROUPS -->
+<div class="moverlay" id="m-groups">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">Manage Groups</div>
+    <div class="ig"><div class="ilabel">New Group Name</div>
+      <div style="display:flex;gap:8px">
+        <input type="text" class="tinput" id="ng-inp" placeholder="e.g. Academic" style="flex:1">
+        <button class="btnp" id="btn-addgrp" style="width:auto;padding:11px 16px">Add</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div id="grp-list"></div>
+    <p style="margin-top:8px;font-size:.75rem;color:var(--text3)">💡 Deleting a group won't delete its words.</p>
+  </div>
+</div>
+
+<!-- MODAL: GAME SETUP -->
+<div class="moverlay" id="m-gamesetup">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle" id="gs-title">Choose Words</div>
+    <div class="ig">
+      <div class="ilabel">Word Scope</div>
+      <select class="sscope" id="gs-scope">
+        <option value="all">All Words</option>
+        <option value="favorites">Favorites Only</option>
+        <option value="group">Specific Group</option>
+      </select>
+      <select class="sscope" id="gs-group" style="display:none"></select>
+    </div>
+    <div id="gs-info" style="font-size:.8rem;color:var(--text2);margin-bottom:14px"></div>
+    <button class="btnp" id="btn-startgame">🎮 Start Game</button>
+  </div>
+</div>
+
+<!-- MODAL: ASSIGN GROUPS -->
+<div class="moverlay" id="m-assign">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">Assign to Groups</div>
+    <div id="assign-list"></div>
+    <div style="margin-top:14px">
+      <button class="btnp" id="btn-assign-done">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: IMPORT -->
+<div class="moverlay" id="m-import">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">Import Words</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      <button class="btnp" id="btn-import-file">📂 Choose JSON File</button>
+      <div style="text-align:center;font-size:.78rem;color:var(--text3);padding:4px 0">— or paste JSON below —</div>
+      <textarea id="import-textarea" class="tinput" rows="6" placeholder='{"words":[...],"groups":[...]}' style="resize:none;font-family:monospace;font-size:.78rem;line-height:1.5"></textarea>
+    </div>
+    <div id="import-info" style="font-size:.8rem;margin-bottom:12px;display:none"></div>
+    <button class="btnp" id="btn-import-confirm">↑ Import</button>
+    <button class="btns" id="btn-import-cancel" style="margin-top:8px">Cancel</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+var ST = {
+  words: [], groups: [],
+  cfg: { model: 'gemini-2.0-flash', apiKey: '', dark: true },
+  activeGroup: 'all',
+  gameType: null, gameWords: [], gameIdx: 0, gameOk: 0, gameBad: 0,
+  assignWid: null
+};
+
+var TC = { noun:'var(--noun)', verb:'var(--verb)', adjective:'var(--adj)', adverb:'var(--adv)' };
+var GN = { definition:'Definition Quiz', antonym:'Antonym Quiz', synonym:'Synonym Quiz', turkish:'Turkish Match' };
+var QL = { definition:'What does this mean?', antonym:'What is the antonym?', synonym:'What is a synonym?', turkish:'Turkish meaning?' };
+
+function save() {
+  try { localStorage.setItem('mq1', JSON.stringify({ words:ST.words, groups:ST.groups, cfg:ST.cfg, activeGroup:ST.activeGroup })); } catch(e) {}
+}
+function load() {
+  try {
+    var d = JSON.parse(localStorage.getItem('mq1') || '{}');
+    if (d.words) ST.words = d.words;
+    if (d.groups) ST.groups = d.groups;
+    if (d.cfg) { ST.cfg.model = d.cfg.model || ST.cfg.model; ST.cfg.apiKey = d.cfg.apiKey || ''; ST.cfg.dark = d.cfg.dark !== undefined ? d.cfg.dark : true; }
+    if (d.activeGroup) ST.activeGroup = d.activeGroup;
+  } catch(e) {}
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function shuffle(a) { var b = a.slice(); for (var i=b.length-1;i>0;i--) { var j=Math.floor(Math.random()*(i+1)); var t=b[i]; b[i]=b[j]; b[j]=t; } return b; }
+var _tt;
+function toast(m) { var t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(function(){t.classList.remove('show');},2200); }
+function openM(id) { var el=document.getElementById(id); if(el) el.classList.add('open'); }
+function closeM(id) { var el=document.getElementById(id); if(el) el.classList.remove('open'); }
+
+// ─── THEME ───────────────────────────────────────────────────────────────────
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', ST.cfg.dark ? 'dark' : 'light');
+  var tb=document.getElementById('btn-theme'); if(tb) tb.textContent = ST.cfg.dark ? '☀️' : '🌙';
+  var dt=document.getElementById('dark-tog'); if(dt) dt.classList.toggle('on', ST.cfg.dark);
+}
+function toggleTheme() { ST.cfg.dark = !ST.cfg.dark; applyTheme(); save(); }
+
+// ─── SCREENS ─────────────────────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.ni').forEach(function(n){ n.classList.remove('active'); });
+  var scr = document.getElementById('s-'+name); if(scr) scr.classList.add('active');
+  var ni = document.getElementById('ni-'+name); if(ni) ni.classList.add('active');
+  if(name==='settings') renderStats();
+}
+
+// ─── GROUP CHIPS ─────────────────────────────────────────────────────────────
+function renderGchips() {
+  var el = document.getElementById('gchips');
+  var chips = [{id:'all',name:'All'},{id:'fav',name:'⭐ Favorites'}].concat(ST.groups);
+  el.innerHTML = chips.map(function(g){
+    return '<div class="gchip'+(ST.activeGroup===g.id?' active':'')+'" data-gid="'+esc(g.id)+'">'+esc(g.name)+'</div>';
+  }).join('');
+}
+
+// ─── GROUP LIST ──────────────────────────────────────────────────────────────
+function renderGrpList() {
+  var el = document.getElementById('grp-list');
+  if (!ST.groups.length) { el.innerHTML='<p style="color:var(--text3);font-size:.82rem;padding:10px 0">No groups yet.</p>'; return; }
+  el.innerHTML = ST.groups.map(function(g){
+    var c = ST.words.filter(function(w){ return (w.groups||[]).indexOf(g.id)>=0; }).length;
+    return '<div class="grpitem"><div><div class="grpname">'+esc(g.name)+'</div><div class="grpcnt">'+c+' word'+(c!==1?'s':'')+'</div></div><span class="grpdel" data-delgrp="'+esc(g.id)+'">🗑</span></div>';
+  }).join('');
+}
+
+// ─── WORD LIST ────────────────────────────────────────────────────────────────
+function renderWords() {
+  var el = document.getElementById('wlist');
+  var q = document.getElementById('search-inp').value.trim().toLowerCase();
+  var ws = ST.words.slice();
+  if (ST.activeGroup==='fav') ws = ws.filter(function(w){ return w.fav; });
+  else if (ST.activeGroup!=='all') ws = ws.filter(function(w){ return (w.groups||[]).indexOf(ST.activeGroup)>=0; });
+  if (q) ws = ws.filter(function(w){ return w.word.toLowerCase().indexOf(q)>=0 || (w.turkish||'').toLowerCase().indexOf(q)>=0; });
+  document.getElementById('wcount').textContent = ws.length+' WORD'+(ws.length!==1?'S':'');
+  if (!ws.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-t">No words yet</div><div class="empty-s">'+(ST.words.length?'No words match your filter.':'Tap + to add your first word.')+'</div></div>';
+    return;
+  }
+  el.innerHTML = ws.map(function(w){
+    var tot=(w.ok||0)+(w.bad||0), pct=tot?Math.round((w.ok||0)/tot*100):null;
+    var c=TC[w.type]||'var(--text3)';
+    return '<div class="wiwrap" id="wp-'+w.id+'"><div class="wi-delbg">🗑</div>'+
+      '<div class="wi" data-wid="'+esc(w.id)+'">'+
+      '<div class="tdot" style="background:'+c+'"></div>'+
+      '<div class="wi-main"><div class="wi-name">'+esc(w.word)+'</div>'+
+      '<div class="wi-meta"><span class="wi-type" style="color:'+c+'">'+esc(w.type||'?')+'</span><span class="wi-tr">'+esc(w.turkish||'')+'</span></div></div>'+
+      '<div class="wi-right"><span class="wscore">'+(pct!==null?pct+'%':'—')+'</span><span class="wfav'+(w.fav?' on':'')+'">♥</span></div>'+
+      '</div></div>';
+  }).join('');
+  ws.forEach(function(w){ initSwipe(w.id); });
+}
+
+// ─── SWIPE DELETE ─────────────────────────────────────────────────────────────
+function initSwipe(wid) {
+  var wrap = document.getElementById('wp-'+wid); if(!wrap) return;
+  var el = wrap.querySelector('.wi'); if(!el) return;
+  var sx=0, cx=0, sw=false;
+  el.addEventListener('touchstart', function(e){ sx=e.touches[0].clientX; sw=true; cx=0; }, {passive:true});
+  el.addEventListener('touchmove', function(e){
+    if(!sw) return;
+    cx = e.touches[0].clientX-sx;
+    if(cx<0){ el.style.transition='none'; el.style.transform='translateX('+Math.max(cx,-80)+'px)'; }
+  }, {passive:true});
+  el.addEventListener('touchend', function(){
+    sw=false; el.style.transition='';
+    if(cx<-60) {
+      el.style.transform='translateX(-80px)';
+      if(confirm('Delete "'+( ST.words.find(function(x){return x.id===wid;})||{word:''}).word+'"?')) {
+        deleteWord(wid);
+      } else {
+        el.style.transform='';
+      }
+    } else { el.style.transform=''; }
+    cx=0;
+  });
+}
+
+function deleteWord(wid) {
+  var w = ST.words.find(function(x){return x.id===wid;});
+  if(!w) return;
+  ST.words = ST.words.filter(function(x){return x.id!==wid;});
+  save(); renderWords(); renderGchips(); toast('"'+w.word+'" deleted');
+}
+
+// ─── ADD WORD ─────────────────────────────────────────────────────────────────
+function openAddModal() {
+  document.getElementById('nw-inp').value='';
+  document.getElementById('nw-loading').style.display='none';
+  document.getElementById('nw-err').style.display='none';
+  document.getElementById('nw-err').textContent='';
+  document.getElementById('btn-analyze').disabled=false;
+  openM('m-addword');
+  setTimeout(function(){ document.getElementById('nw-inp').focus(); }, 320);
+}
+
+function analyzeWord() {
+  var word = document.getElementById('nw-inp').value.trim();
+  if(!word) return toast('Enter a word first');
+  if(ST.words.find(function(w){return w.word.toLowerCase()===word.toLowerCase();})) return toast('Word already added');
+  var apiKey=ST.cfg.apiKey, model=ST.cfg.model;
+  if(!apiKey||!model){ toast('Set API key in Settings first'); closeM('m-addword'); showScreen('settings'); return; }
+  document.getElementById('nw-loading').style.display='flex';
+  document.getElementById('nw-err').style.display='none';
+  document.getElementById('btn-analyze').disabled=true;
+  var prompt = 'Analyze the English word "'+word+'" and return ONLY a valid JSON object:\n{"word":"'+word+'","phonetic":"IPA phonetic","type":"noun|verb|adjective|adverb","turkish":"Turkish 1-3 words","definition":"English definition","synonyms":["s1","s2","s3"],"antonyms":["a1","a2","a3"],"example":"One example sentence","wordFamily":[{"pos":"noun","word":""},{"pos":"verb","word":""},{"pos":"adjective","word":""},{"pos":"adverb","word":""}]}\nReturn ONLY the JSON, no markdown, no extra text.';
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+apiKey, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+  }).then(function(res){ return res.json(); }).then(function(data){
+    if(data.error) throw new Error(data.error.message);
+    var txt = ((data.candidates||[])[0]||{content:{parts:[{text:''}]}}).content.parts[0].text;
+    txt = txt.replace(/```json|```/g,'').trim();
+    var info = JSON.parse(txt);
+    var nw = {
+      id: Date.now().toString(),
+      word: info.word||word, phonetic:info.phonetic||'',
+      type:(info.type||'noun').toLowerCase(), turkish:info.turkish||'',
+      definition:info.definition||'', synonyms:info.synonyms||[],
+      antonyms:info.antonyms||[], example:info.example||'',
+      wordFamily:info.wordFamily||[], groups:[], fav:false, ok:0, bad:0
+    };
+    ST.words.unshift(nw);
+    save(); renderWords(); renderGchips();
+    closeM('m-addword');
+    toast('"'+(info.word||word)+'" added ✓');
+  }).catch(function(e){
+    var errel=document.getElementById('nw-err');
+    errel.textContent='⚠️ '+(e.message||'Error. Check API key & model name.');
+    errel.style.display='block';
+    document.getElementById('btn-analyze').disabled=false;
+  }).finally(function(){
+    document.getElementById('nw-loading').style.display='none';
+  });
+}
+
+// ─── WORD DETAIL ──────────────────────────────────────────────────────────────
+function openDetail(wid) {
+  var w = ST.words.find(function(x){return x.id===wid;}); if(!w) return;
+  var c=TC[w.type]||'var(--text3)';
+  var tot=(w.ok||0)+(w.bad||0), pct=tot?Math.round((w.ok||0)/tot*100):0;
+  var synH=(w.synonyms||[]).length?(w.synonyms||[]).map(function(s){return '<span class="chip">'+esc(s)+'</span>';}).join(''):'<span style="color:var(--text3);font-size:.82rem">—</span>';
+  var antH=(w.antonyms||[]).length?(w.antonyms||[]).map(function(s){return '<span class="chip">'+esc(s)+'</span>';}).join(''):'<span style="color:var(--text3);font-size:.82rem">—</span>';
+  var famH=(w.wordFamily||[]).filter(function(f){return f.word;}).map(function(f){return '<div class="famitem"><div class="fampos">'+esc(f.pos)+'</div><div class="famword">'+esc(f.word)+'</div></div>';}).join('')||'<span style="color:var(--text3);font-size:.82rem">—</span>';
+  var grpH=ST.groups.filter(function(g){return (w.groups||[]).indexOf(g.id)>=0;}).map(function(g){return '<span style="background:var(--bg3);border:1px solid var(--border);border-radius:99px;padding:3px 10px;font-size:.7rem;color:var(--text2)">'+esc(g.name)+'</span>';}).join('');
+  document.getElementById('m-detail-body').innerHTML =
+    '<div class="mhandle"></div>'+
+    '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">'+
+      '<div><div class="dword">'+esc(w.word)+'</div>'+
+      '<div class="dphon"><span>'+esc(w.phonetic||'')+'</span>'+
+      '<div class="spkbtn" data-speak="'+esc(w.word)+'">🔊</div></div></div>'+
+      '<div style="display:flex;gap:8px;margin-top:4px">'+
+        '<div class="ibtn" data-fav="'+w.id+'" style="color:'+(w.fav?'#ff7eb3':'var(--text3)')+';">'+(w.fav?'♥':'♡')+'</div>'+
+        '<div class="ibtn" data-openassign="'+w.id+'">⊞</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="dtbadge" style="background:'+c+'22;color:'+c+';border:1.5px solid '+c+'44">'+esc(w.type)+'</div>'+
+    (grpH?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">'+grpH+'</div>':'')+
+    '<div class="dsec"><div class="dlbl">Definition</div><div class="dval">'+esc(w.definition)+'</div></div>'+
+    '<div class="dsec"><div class="dlbl">Turkish</div><div class="dval" style="font-size:1.05rem;font-weight:700">'+esc(w.turkish)+'</div></div>'+
+    '<div class="dsec"><div class="dlbl">Example</div><div class="dex">'+esc(w.example)+'</div></div>'+
+    '<div class="dsec"><div class="dlbl">Synonyms</div><div class="chiprow">'+synH+'</div></div>'+
+    '<div class="dsec"><div class="dlbl">Antonyms</div><div class="chiprow">'+antH+'</div></div>'+
+    '<div class="dsec"><div class="dlbl">Word Family</div><div class="famrow">'+famH+'</div></div>'+
+    '<div class="divider"></div>'+
+    '<div class="dsec"><div class="dlbl">Quiz Statistics</div>'+
+      '<div class="dstats">'+
+        '<div class="sbox"><div class="snum g">'+(w.ok||0)+'</div><div class="slbl">Correct</div></div>'+
+        '<div class="sbox"><div class="snum r">'+(w.bad||0)+'</div><div class="slbl">Wrong</div></div>'+
+        '<div class="sbox"><div class="snum">'+(tot?pct+'%':'—')+'</div><div class="slbl">Score</div></div>'+
+      '</div>'+
+      '<div class="sbar"><div class="sfill" style="width:'+pct+'%"></div></div>'+
+    '</div>'+
+    '<div style="margin-top:16px"><button class="btnr" data-delword="'+w.id+'">Delete Word</button></div>';
+  openM('m-detail');
+}
+
+// ─── ASSIGN GROUPS ────────────────────────────────────────────────────────────
+function openAssign(wid) {
+  ST.assignWid = wid;
+  var w = ST.words.find(function(x){return x.id===wid;});
+  var el = document.getElementById('assign-list');
+  if (!ST.groups.length) { el.innerHTML='<p style="color:var(--text3);font-size:.82rem">No groups yet. Create groups first.</p>'; }
+  else {
+    el.innerHTML = ST.groups.map(function(g){
+      var on=(w.groups||[]).indexOf(g.id)>=0;
+      return '<div class="arow"><span>'+esc(g.name)+'</span><div class="acheck'+(on?' on':'')+'" data-achk="'+esc(g.id)+'">'+(on?'✓':'')+'</div></div>';
+    }).join('');
+  }
+  closeM('m-detail');
+  openM('m-assign');
+}
+
+// ─── GAMES ───────────────────────────────────────────────────────────────────
+function openGameSetup(type) {
+  ST.gameType = type;
+  document.getElementById('gs-title').textContent = GN[type];
+  var ggs = document.getElementById('gs-group');
+  ggs.innerHTML = ST.groups.map(function(g){return '<option value="'+esc(g.id)+'">'+esc(g.name)+'</option>';}).join('');
+  ggs.style.display='none';
+  document.getElementById('gs-scope').value='all';
+  updateGsInfo();
+  openM('m-gamesetup');
+}
+
+function getGameWords() {
+  var scope=document.getElementById('gs-scope').value;
+  if(scope==='favorites') return ST.words.filter(function(w){return w.fav;});
+  if(scope==='group'){ var gid=document.getElementById('gs-group').value; return ST.words.filter(function(w){return (w.groups||[]).indexOf(gid)>=0;}); }
+  return ST.words.slice();
+}
+
+function updateGsInfo() {
+  var scope=document.getElementById('gs-scope').value;
+  document.getElementById('gs-group').style.display=scope==='group'?'block':'none';
+  var ws=getGameWords();
+  var el=document.getElementById('gs-info'), btn=document.getElementById('btn-startgame');
+  if(ws.length<4){ el.innerHTML='<span style="color:var(--red)">⚠️ Need at least 4 words (have '+ws.length+')</span>'; btn.disabled=true; }
+  else { el.innerHTML='<span style="color:var(--green)">✓ '+ws.length+' words available</span>'; btn.disabled=false; }
+}
+
+function startGame() {
+  var ws=getGameWords();
+  if(ws.length<4) return toast('Need at least 4 words');
+  ST.gameWords=shuffle(ws); ST.gameIdx=0; ST.gameOk=0; ST.gameBad=0;
+  closeM('m-gamesetup');
+  document.getElementById('gplay-title').textContent=GN[ST.gameType];
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
+  document.getElementById('s-gameplay').classList.add('active');
+  document.getElementById('ni-games').classList.add('active');
+  renderQ();
+}
+
+function wrongs(correct, field, n) {
+  var pool=shuffle(ST.words.filter(function(w){return w.id!==correct.id;}));
+  var res=[];
+  for(var i=0;i<pool.length&&res.length<n;i++){
+    var w=pool[i];
+    var v = field==='word'?w.word : field==='turkish'?w.turkish : field==='definition'?w.definition : field==='antonym'?(w.antonyms&&w.antonyms[0]) : (w.synonyms&&w.synonyms[0]);
+    if(v&&res.indexOf(v)<0) res.push(v);
+  }
+  while(res.length<n) res.push('—');
+  return res;
+}
+
+function renderQ() {
+  var total=ST.gameWords.length;
+  if(ST.gameIdx>=total){ renderResult(); return; }
+  document.getElementById('gpfill').style.width=(ST.gameIdx/total*100)+'%';
+  document.getElementById('gsbadge').textContent=ST.gameOk+' / '+ST.gameIdx;
+  var w=ST.gameWords[ST.gameIdx], type=ST.gameType;
+  var qtext='', qsub='', correct='', opts=[];
+  if(type==='definition'){ qtext=w.word; qsub='/'+w.phonetic+'/'; correct=w.definition; opts=shuffle([correct].concat(wrongs(w,'definition',3))); }
+  else if(type==='antonym'){ qtext=w.word; qsub=(w.definition||'').slice(0,50)+'…'; correct=w.antonyms&&w.antonyms[0]; if(!correct){ST.gameIdx++;renderQ();return;} opts=shuffle([correct].concat(wrongs(w,'word',3))); }
+  else if(type==='synonym'){ qtext=w.word; qsub=(w.definition||'').slice(0,50)+'…'; correct=w.synonyms&&w.synonyms[0]; if(!correct){ST.gameIdx++;renderQ();return;} opts=shuffle([correct].concat(wrongs(w,'word',3))); }
+  else if(type==='turkish'){ qtext=w.word; qsub='/'+w.phonetic+'/'; correct=w.turkish; opts=shuffle([correct].concat(wrongs(w,'turkish',3))); }
+  var optsHtml=opts.map(function(o){
+    return '<div class="gopt" data-opt="'+esc(o)+'" data-correct="'+esc(correct)+'" data-wid="'+w.id+'">'+esc(o)+'</div>';
+  }).join('');
+  document.getElementById('gcnt').innerHTML=
+    '<div class="gqcard fin"><div class="gqlbl">'+QL[type]+'</div><div class="gqtext">'+esc(qtext)+'</div>'+(qsub?'<div class="gqsub">'+esc(qsub)+'</div>':'')+'</div>'+
+    '<div class="gopts">'+optsHtml+'</div>'+
+    '<div style="text-align:center;color:var(--text3);font-size:.78rem">'+(ST.gameIdx+1)+' / '+total+'</div>';
+}
+
+function renderResult() {
+  var total=ST.gameWords.length, pct=total?Math.round(ST.gameOk/total*100):0;
+  var emoji=pct>=80?'🏆':pct>=60?'🎉':pct>=40?'💪':'📚';
+  var msg=pct>=80?'Excellent!':pct>=60?'Good job!':pct>=40?'Keep going!':'Keep studying!';
+  document.getElementById('gpfill').style.width='100%';
+  document.getElementById('gsbadge').textContent=ST.gameOk+' / '+total;
+  document.getElementById('gcnt').innerHTML=
+    '<div class="gresult fin">'+
+    '<div class="remoji">'+emoji+'</div>'+
+    '<div class="rtitle">'+msg+'</div>'+
+    '<div class="rscore">Got <span>'+ST.gameOk+' / '+total+'</span> correct ('+pct+'%)</div>'+
+    '<button class="btnp" id="btn-playagain" style="margin-top:8px">🔄 Play Again</button>'+
+    '<button class="btns" id="btn-exitgame2" style="margin-top:8px">← Back to Games</button>'+
+    '</div>';
+  renderWords();
+}
+
+// ─── IMPORT ──────────────────────────────────────────────────────────────────
+function openImportModal() {
+  document.getElementById('import-textarea').value = '';
+  document.getElementById('import-info').style.display = 'none';
+  openM('m-import');
+}
+
+function processImportData(jsonStr) {
+  var infoEl = document.getElementById('import-info');
+  var data;
+  try {
+    data = JSON.parse(jsonStr.trim());
+  } catch(e) {
+    infoEl.innerHTML = '<span style="color:var(--red)">⚠️ Invalid JSON. Check the format.</span>';
+    infoEl.style.display = 'block';
+    return;
+  }
+  var importedWords = data.words || (Array.isArray(data) ? data : []);
+  var importedGroups = data.groups || [];
+  if (!importedWords.length) {
+    infoEl.innerHTML = '<span style="color:var(--red)">⚠️ No words found in this file.</span>';
+    infoEl.style.display = 'block';
+    return;
+  }
+  // merge groups (skip duplicates by name)
+  var addedGroups = 0;
+  importedGroups.forEach(function(g) {
+    if (!ST.groups.find(function(x){return x.name.toLowerCase()===g.name.toLowerCase();})) {
+      ST.groups.push({ id: g.id || Date.now().toString()+Math.random(), name: g.name });
+      addedGroups++;
+    }
+  });
+  // merge words (skip duplicates by word string)
+  var addedWords = 0, skipped = 0;
+  importedWords.forEach(function(w) {
+    if (ST.words.find(function(x){return x.word.toLowerCase()===(w.word||'').toLowerCase();})) {
+      skipped++;
+    } else {
+      ST.words.push({
+        id: Date.now().toString() + Math.random(),
+        word: w.word||'', phonetic: w.phonetic||'',
+        type: w.type||'noun', turkish: w.turkish||'',
+        definition: w.definition||'', synonyms: w.synonyms||[],
+        antonyms: w.antonyms||[], example: w.example||'',
+        wordFamily: w.wordFamily||[], groups: w.groups||[],
+        fav: w.fav||false, ok: w.ok||0, bad: w.bad||0
+      });
+      addedWords++;
+    }
+  });
+  save(); renderWords(); renderGchips(); closeM('m-import');
+  toast('Imported '+addedWords+' words'+(skipped?' ('+skipped+' skipped)':'')+'');
+}
+
+// ─── SETTINGS ────────────────────────────────────────────────────────────────
+function renderStats() {
+  var el=document.getElementById('gstats'); if(!el) return;
+  var tot=ST.words.length, favs=ST.words.filter(function(w){return w.fav;}).length;
+  var ok=ST.words.reduce(function(a,w){return a+(w.ok||0);},0);
+  var bad=ST.words.reduce(function(a,w){return a+(w.bad||0);},0);
+  var tq=ok+bad, pct=tq?Math.round(ok/tq*100):0;
+  el.innerHTML=[['Total Words',tot,'var(--accent)'],['Favorites',favs,'#ff7eb3'],['Total Questions',tq,'var(--text2)'],['Overall Score',tq?pct+'%':'—','var(--green)']].map(function(x){
+    return '<div class="srow" style="cursor:default"><div class="srow-info"><div class="srow-t">'+x[0]+'</div></div><div style="font-family:monospace;font-weight:700;color:'+x[2]+'">'+x[1]+'</div></div>';
+  }).join('');
+}
+
+// ─── MAIN EVENT LISTENER ─────────────────────────────────────────────────────
+document.addEventListener('click', function(e) {
+  var t = e.target;
+
+  // NAV ITEMS
+  var ni = t.closest ? t.closest('.ni[data-screen]') : null;
+  if (ni) { showScreen(ni.getAttribute('data-screen')); return; }
+
+  // FAB
+  if (t.id==='fab-add' || (t.closest && t.closest('#fab-add'))) { openAddModal(); return; }
+
+  // HEADER BUTTONS
+  if (t.id==='btn-groups' || (t.closest && t.closest('#btn-groups'))) { renderGrpList(); openM('m-groups'); return; }
+  if (t.id==='btn-theme' || (t.closest && t.closest('#btn-theme'))) { toggleTheme(); return; }
+  if (t.id==='row-darkmode' || (t.closest && t.closest('#row-darkmode'))) { toggleTheme(); return; }
+
+  // WORD ITEM (not fav click)
+  var wi = t.closest ? t.closest('.wi[data-wid]') : null;
+  if (wi) {
+    if (t.classList.contains('wfav')) {
+      var ww = ST.words.find(function(x){return x.id===wi.getAttribute('data-wid');});
+      if(ww){ ww.fav=!ww.fav; save(); renderWords(); toast(ww.fav?'♥ Added to favorites':'Removed from favorites'); }
+      return;
+    }
+    openDetail(wi.getAttribute('data-wid')); return;
+  }
+
+  // GROUP CHIPS
+  var gc = t.closest ? t.closest('.gchip[data-gid]') : null;
+  if (gc) { ST.activeGroup=gc.getAttribute('data-gid'); renderGchips(); renderWords(); return; }
+
+  // ANALYZE WORD
+  if (t.id==='btn-analyze') { analyzeWord(); return; }
+
+  // GAME CARDS
+  var gcard = t.closest ? t.closest('.gcard[data-game]') : null;
+  if (gcard) { openGameSetup(gcard.getAttribute('data-game')); return; }
+
+  // GAME START
+  if (t.id==='btn-startgame') { startGame(); return; }
+
+  // GAME BACK
+  if (t.id==='btn-game-back' || (t.closest && t.closest('#btn-game-back'))) { showScreen('games'); return; }
+
+  // GAME OPTIONS
+  var gopt = t.closest ? t.closest('.gopt') : null;
+  if (gopt && !gopt.classList.contains('disabled')) {
+    var ans=gopt.getAttribute('data-opt'), cor=gopt.getAttribute('data-correct'), wid=gopt.getAttribute('data-wid');
+    document.querySelectorAll('.gopt').forEach(function(o){o.classList.add('disabled');});
+    var isOk=ans===cor;
+    gopt.classList.add(isOk?'correct':'wrong');
+    if(!isOk) document.querySelectorAll('.gopt').forEach(function(o){if(o.getAttribute('data-opt')===cor)o.classList.add('correct');});
+    var gw=ST.words.find(function(x){return x.id===wid;});
+    if(gw){ if(isOk) gw.ok=(gw.ok||0)+1; else gw.bad=(gw.bad||0)+1; save(); }
+    if(isOk) ST.gameOk++; else ST.gameBad++;
+    ST.gameIdx++;
+    setTimeout(renderQ, 1100);
+    return;
+  }
+
+  // PLAY AGAIN / EXIT GAME
+  if (t.id==='btn-playagain') { startGame(); return; }
+  if (t.id==='btn-exitgame2') { showScreen('games'); return; }
+
+  // SPEAK BUTTON
+  var spk = t.closest ? t.closest('.spkbtn[data-speak]') : null;
+  if (spk) { var u=new SpeechSynthesisUtterance(spk.getAttribute('data-speak')); u.lang='en-US'; u.rate=0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); return; }
+
+  // DETAIL FAV
+  var dfav = t.closest ? t.closest('[data-fav]') : null;
+  if (dfav && dfav.closest('#m-detail-body')) {
+    var dw2=ST.words.find(function(x){return x.id===dfav.getAttribute('data-fav');}); if(dw2){dw2.fav=!dw2.fav;save();renderWords();openDetail(dw2.id);} return;
+  }
+
+  // DETAIL ASSIGN GROUPS
+  var oas = t.closest ? t.closest('[data-openassign]') : null;
+  if (oas) { openAssign(oas.getAttribute('data-openassign')); return; }
+
+  // DETAIL DELETE WORD
+  var dword = t.closest ? t.closest('[data-delword]') : null;
+  if (dword) { if(confirm('Delete this word?')){ deleteWord(dword.getAttribute('data-delword')); closeM('m-detail'); } return; }
+
+  // ASSIGN CHECKBOX
+  var achk = t.closest ? t.closest('.acheck[data-achk]') : null;
+  if (achk) {
+    var gid=achk.getAttribute('data-achk'), aw=ST.words.find(function(x){return x.id===ST.assignWid;});
+    if(aw){ aw.groups=aw.groups||[]; var idx=aw.groups.indexOf(gid); if(idx>=0)aw.groups.splice(idx,1); else aw.groups.push(gid);
+      save(); renderWords(); achk.classList.toggle('on',aw.groups.indexOf(gid)>=0); achk.textContent=aw.groups.indexOf(gid)>=0?'✓':''; }
+    return;
+  }
+  if (t.id==='btn-assign-done') { closeM('m-assign'); return; }
+
+  // GROUPS MODAL ADD
+  if (t.id==='btn-addgrp') {
+    var inp=document.getElementById('ng-inp'), name=inp.value.trim();
+    if(!name) return toast('Enter a group name');
+    if(ST.groups.find(function(g){return g.name.toLowerCase()===name.toLowerCase();})) return toast('Group already exists');
+    ST.groups.push({id:Date.now().toString(),name:name});
+    inp.value=''; save(); renderGrpList(); renderGchips(); toast('Group "'+name+'" created');
+    return;
+  }
+
+  // GROUPS MODAL DELETE
+  var dgrp = t.closest ? t.closest('[data-delgrp]') : null;
+  if (dgrp) {
+    var gid2=dgrp.getAttribute('data-delgrp'), g2=ST.groups.find(function(x){return x.id===gid2;});
+    if(!confirm("Delete group \"" + (g2 ? g2.name : '') + "\"? Words won't be deleted.")) return;
+    ST.groups=ST.groups.filter(function(x){return x.id!==gid2;});
+    ST.words.forEach(function(w){w.groups=(w.groups||[]).filter(function(id){return id!==gid2;});});
+    if(ST.activeGroup===gid2) ST.activeGroup='all';
+    save(); renderGrpList(); renderGchips(); renderWords(); toast('Group deleted');
+    return;
+  }
+
+  // SETTINGS SAVE
+  if (t.id==='btn-save-api') {
+    ST.cfg.model=document.getElementById('api-model').value.trim()||'gemini-2.0-flash';
+    ST.cfg.apiKey=document.getElementById('api-key').value.trim();
+    save(); toast('Settings saved ✓'); return;
+  }
+  if (t.id==='btn-apiv') { var ki=document.getElementById('api-key'); ki.type=ki.type==='password'?'text':'password'; return; }
+  if (t.id==='btn-import' || (t.closest && t.closest('#btn-import'))) { openImportModal(); return; }
+  if (t.id==='btn-import-file') {
+    document.getElementById('import-file-inp').click(); return;
+  }
+  if (t.id==='btn-import-confirm') {
+    var txt = document.getElementById('import-textarea').value.trim();
+    if (!txt) { document.getElementById('import-info').innerHTML='<span style="color:var(--red)">⚠️ Paste JSON or choose a file.</span>'; document.getElementById('import-info').style.display='block'; return; }
+    processImportData(txt); return;
+  }
+  if (t.id==='btn-import-cancel') { closeM('m-import'); return; }
+  if (t.id==='btn-export' || (t.closest && t.closest('#btn-export'))) {
+    var b=new Blob([JSON.stringify({words:ST.words,groups:ST.groups},null,2)],{type:'application/json'});
+    var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='macaque_export.json'; a.click(); return;
+  }
+  if (t.id==='btn-clear' || (t.closest && t.closest('#btn-clear'))) {
+    if(confirm('Delete ALL words and groups?')){ ST.words=[]; ST.groups=[]; ST.activeGroup='all'; save(); renderWords(); renderGchips(); toast('All data cleared'); } return;
+  }
+
+  // MODAL OVERLAY CLOSE
+  if (t.classList.contains('moverlay')) { closeM(t.id); return; }
+});
+
+// FILE INPUT FOR IMPORT
+document.getElementById('import-file-inp').addEventListener('change', function(e) {
+  var file = e.target.files[0]; if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    document.getElementById('import-textarea').value = ev.target.result;
+    document.getElementById('import-info').innerHTML = '<span style="color:var(--green)">✓ File loaded: '+esc(file.name)+'</span>';
+    document.getElementById('import-info').style.display = 'block';
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+// GAME SCOPE CHANGE
+document.getElementById('gs-scope').addEventListener('change', updateGsInfo);
+document.getElementById('gs-group').addEventListener('change', updateGsInfo);
+
+// SEARCH
+document.getElementById('search-inp').addEventListener('input', renderWords);
+
+// ENTER KEY IN ADD MODAL
+document.getElementById('nw-inp').addEventListener('keydown', function(e){ if(e.key==='Enter') analyzeWord(); });
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+load();
+applyTheme();
+document.getElementById('api-model').value = ST.cfg.model || 'gemini-2.0-flash';
+document.getElementById('api-key').value = ST.cfg.apiKey || '';
+renderGchips();
+renderWords();
+</script>
+</body>
+</html>
